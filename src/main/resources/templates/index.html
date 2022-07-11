@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+
+    <title>Кинотеатр</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="card" style="width: 100%">
+            <div class="card-header">
+                Введите ваши данные для покупки билета.
+            </div>
+            <div class="form-group">
+                <form th:action="@{/formInitialData}" method="GET" th:object="${user}">
+                    <input type="hidden" name="id" value="0">
+                    <label for="username">Имя</label><br>
+                    <input type="text" class="form-control" name="username" th:value="${user.username}" id="username" required>
+                    <label for="email">Email</label><br>
+                    <input type="email" class="form-control" name="email" th:value="${user.email}" id="email" required>
+                    <label for="phone">Cотовый телефон(8xxxxxxxxxx)</label><br>
+                    <input type="tel" class="form-control" name="phone" th:value="${user.phone}" id="phone"
+                           pattern="[8]{1}[0-9]{10}" required>
+                    <button type="reset" class="btn btn-warning" style="float: right">Очистить</button><br>
+                    <label for="session">Кинофильм</label><br>
+                    <input type="text" class="form-control" disabled="disabled" th:value="${film.name}" id="session">
+                    <input type="hidden" name="session.id" th:value="${sessionId}">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Ряд</th>
+                            <th>Свободные места<br> (выберите одно место)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <button th:if="${message} != null" th:text="${message}" type="button" class="btn btn-danger"
+                            style="float: left"></button>
+                        <tr th:each="entry: ${seats}" th:with="cells=${entry.value}">
+                            <td>
+                                <input type="radio" class="form-group" th:value="${entry.key}" th:text="${entry.key}"
+                                       name="row" checked/>
+                            </td>
+                            <td>
+                                <input th:each="cell: ${entry.value}" type="checkbox" class="form-group" th:value="${cell}"
+                                       th:text="${cell}" name="cell"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary" style="float: right">Купить билет</button>
+                </form>
+                <form th:action="@{/sessions}" method="GET">
+                <button type="submit" class="btn btn-dark" style="float: left">Выбрать фильм</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
