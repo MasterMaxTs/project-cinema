@@ -41,11 +41,10 @@ public class SessionController {
                         @RequestParam("session.id") int sessionId,
                         @RequestParam(value = "msg", required = false) String msg,
                         Model model) {
-        model.addAttribute("film", sessionService.findSessionById(sessionId).get());
-        model.addAttribute(
-                "seats",
-                sessionService.mapFreeSeats(ticketService.getMapOccupiedSeats(sessionId))
-        );
+        model.addAttribute("film",
+                sessionService.findSessionById(sessionId).get());
+        model.addAttribute("seats",
+                sessionService.mapFreeSeats(ticketService.getMapOccupiedSeats(sessionId)));
         model.addAttribute("message", msg);
         model.addAttribute("sessionId", sessionId);
         return "index";
@@ -62,12 +61,14 @@ public class SessionController {
         User userFromDb = userInDb.get();
         if (validateReqCell(req)) {
             int cellId = Integer.parseInt(req.getParameter("cell"));
-            Ticket ticket = new Ticket(0,
-                    sessionId,
-                    rowId,
-                    cellId,
-                    userFromDb.getId());
-            Optional<Ticket> ticketInDb = ticketService.createTicket(ticket);
+            Optional<Ticket> ticketInDb =
+                                    ticketService.createTicket(
+                                            new Ticket(0,
+                                                        sessionId,
+                                                        rowId,
+                                                        cellId,
+                                                        userFromDb.getId()
+                                            ));
             if (ticketInDb.isEmpty()) {
                 return getRedirectIfTicketIsEmpty(redirectAttributes,
                                                   sessionId,
@@ -76,7 +77,11 @@ public class SessionController {
                                                   userFromDb
                 );
             }
-            return createTicket(model, userFromDb, sessionId, ticketInDb.get());
+            model.addAttribute("user", userFromDb);
+            model.addAttribute("film",
+                    sessionService.findSessionById(sessionId).get());
+            model.addAttribute("ticket", ticketInDb.get());
+            return "ticket";
         }
         return getRedirectIfWrongChoiceOfCells(redirectAttributes,
                                                userFromDb,
@@ -117,17 +122,5 @@ public class SessionController {
         redirectAttributes.addAttribute("msg", message);
         redirectAttributes.addAttribute("session.id", sessionId);
         return "redirect:/index";
-    }
-
-    private String createTicket(Model model,
-                                User userFromDb,
-                                int sessionId,
-                                Ticket ticketFromDb
-                                ) {
-        model.addAttribute("user", userFromDb);
-        model.addAttribute("film",
-                sessionService.findSessionById(sessionId).get());
-        model.addAttribute("ticket", ticketFromDb);
-        return "ticket";
     }
 }

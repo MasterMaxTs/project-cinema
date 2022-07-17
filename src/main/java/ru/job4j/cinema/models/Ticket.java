@@ -8,7 +8,6 @@ public class Ticket {
     private int cell;
     private int userId;
 
-
     public Ticket() {
 
     }

@@ -75,7 +75,6 @@ public class TicketsDBStore {
             }
         } catch (SQLException e) {
             LOG.error("Ошибка: " + e.getMessage(), e);
-            throw new RuntimeException(e);
         }
         LOG.info("Все проданные билеты по id киносеанса получены");
         return tickets;

@@ -41,7 +41,6 @@ public class SessionsDBStore {
             }
         } catch (SQLException e) {
             LOG.error("Ошибка: " + e.getMessage(), e);
-            throw new RuntimeException(e);
         }
         LOG.info("Успешно");
         return sessions;
@@ -66,7 +65,6 @@ public class SessionsDBStore {
             }
         } catch (SQLException e) {
             LOG.error("Ошибка: " + e.getMessage(), e);
-            throw new RuntimeException(e);
         }
         LOG.info("Фильм найден");
         return rsl;

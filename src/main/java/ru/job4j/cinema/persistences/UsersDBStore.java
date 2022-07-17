@@ -22,11 +22,12 @@ public class UsersDBStore {
     }
 
     public Optional<User> addUser(User user) {
-        Optional<User> userInDb = findOldUserInDb(user);
+        LOG.info("Попытка найти пользователя в БД");
+        Optional<User> userInDb = updateUser(user);
         if (userInDb.isPresent()) {
             return userInDb;
         }
-        Optional<User> rsl;
+        LOG.info("Пользователь не найден в БД");
         String sql = "INSERT INTO users (username, email, phone)"
                 + "VALUES (? , ? , ?)";
         LOG.info("Попытка добавить пользователя в БД");
@@ -42,45 +43,43 @@ public class UsersDBStore {
                 if (it.next()) {
                     user.setId(it.getInt("id"));
                 }
-                rsl = Optional.of(user);
+                userInDb = Optional.of(user);
             }
         } catch (SQLException e) {
             LOG.error("Ошибка: " + e.getMessage(), e);
-            throw new RuntimeException(e);
         }
-        LOG.info("Успешно");
-        return rsl;
+        LOG.info("Добавлен новый пользователь в БД");
+        return userInDb;
     }
 
-    public Optional<User> findUserInDbByEmailAndPhone(User user) {
+    public Optional<User> updateUser(User user) {
         Optional<User> rsl = Optional.empty();
-        String sql = "SELECT * FROM users WHERE email = ? AND phone = ?";
-        LOG.info("Попытка найти пользователя по email или телефону в таблице users из БД");
+        String sql = "UPDATE users SET phone = ? WHERE email = ?";
+        LOG.info("Попытка обновить телефон зарегистрированному пользователю в БД");
         try (Connection cn = pool.getConnection()) {
             PreparedStatement ps = cn.prepareStatement(sql);
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getPhone());
-            ps.execute();
-            try (ResultSet it = ps.executeQuery()) {
-                if (it.next()) {
-                    rsl = Optional.of(
-                            new User(it.getInt("id"),
-                                     it.getString("username"),
-                                     it.getString("email"),
-                                     it.getString("phone")
-                            )
-                    );
+            ps.setString(1, user.getPhone());
+            ps.setString(2, user.getEmail());
+            if (ps.executeUpdate() > 0) {
+                sql = "SELECT * FROM users WHERE email = ?";
+                PreparedStatement st = cn.prepareStatement(sql);
+                st.setString(1, user.getEmail());
+                try (ResultSet it = st.executeQuery()) {
+                    if (it.next()) {
+                        rsl = Optional.of(
+                                new User(it.getInt("id"),
+                                        it.getString("username"),
+                                        it.getString("email"),
+                                        it.getString("phone")
+                                )
+                        );
+                    }
                 }
+                LOG.info("Телефон пользователя обновлен в БД");
             }
         } catch (SQLException e) {
             LOG.error("Ошибка: " + e.getMessage(), e);
-            throw new RuntimeException(e);
         }
-        LOG.info("Успешно");
         return rsl;
-    }
-
-    private Optional<User> findOldUserInDb(User user) {
-        return findUserInDbByEmailAndPhone(user);
     }
 }
