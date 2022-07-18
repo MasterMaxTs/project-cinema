@@ -19,6 +19,17 @@
             crossorigin="anonymous"></script>
 
     <title>Кинотеатр</title>
+    <style>
+        .cell-table-one {
+            width: 10%;
+        }
+        .cell-table-two {
+            width: 90%;
+        }
+        .cells-scale {
+            width: 4%;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -44,21 +55,21 @@
                     <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th>Ряд</th>
-                            <th>Свободные места<br> (выберите одно место)</th>
+                            <th style="text-align: left">Ряд</th>
+                            <th style="text-align: center">Свободные места<br> (выберите одно место)</th>
                         </tr>
                         </thead>
                         <tbody>
                             <button th:if="${message} != null" th:text="${message}" type="button" class="btn btn-danger"
                                 style="float: left"></button>
                             <tr th:each="entry: ${seats}" th:with="cells=${entry.value}">
-                                <td th:if="${cells.size} != 0">
+                                <td th:if="${cells.size} != 0" class="cell-table-one">
                                     <input type="radio" class="form-group" th:value="${entry.key}" th:text="${entry.key}"
                                            name="row" checked/>
                                 </td>
-                                <td>
-                                    <input th:each="cell: ${cells}" type="checkbox" class="form-group" th:value="${cell}"
-                                           th:text="${cell}" name="cell"/>
+                                <td class="cell-table-two">
+                                    <input th:each="cell: ${cells}" type="checkbox" class="form-group"
+                                           th:class="cells-scale" th:value="${cell}" th:text="${cell}" name="cell"/>
                                 </td>
                             </tr>
                         </tbody>
