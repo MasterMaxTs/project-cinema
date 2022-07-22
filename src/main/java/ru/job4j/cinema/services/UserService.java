@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.cinema.models.User;
 import ru.job4j.cinema.persistences.UsersDBStore;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -13,6 +14,10 @@ public class UserService {
 
     public UserService(UsersDBStore store) {
         this.store = store;
+    }
+
+    public List<User> findAllUsers() {
+        return store.findAllUsers();
     }
 
     public Optional<User> addUser(User user) {
